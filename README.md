@@ -1,95 +1,94 @@
-## Overview
+# Embedded Cry Detection and Soothing System
 
-This project presents a fully integrated embedded system designed to automatically detect infant distress (crying) and respond with appropriate soothing actions. The system combines signal processing, decision-making algorithms, and hardware control to reduce crying duration efficiently.
-
-The entire system — including architecture design, implementation, debugging, and integration — was independently developed.
-
-## Key Achievement
-
-- Successfully reduced infant crying duration to under **2 minutes** through automated intervention.
-- Demonstrated real-time responsiveness across multiple subsystems.
+Distributed embedded system on PYNQ hardware that detects infant crying via ADC audio sampling and autonomously triggers soothing responses. Four nodes communicate over a ring UART bus.
 
 ---
 
 ## System Architecture
 
-The project consists of several interconnected modules:
+Four PYNQ nodes connected in a ring topology via UART:
 
-### 1. Cry Detection Module
-- Processes audio input to detect crying patterns
-- Uses signal thresholding and pattern recognition
-- Outputs a crying intensity level
+| Address | Module | File | Role |
+|---------|--------|------|------|
+| 0 | Master / Decision | `decision/main.c` | Coordinates all nodes, implements soothing state machine |
+| 1 | Heartbeat | `heartbeat/` | Monitors system vitals, reports to master |
+| 2 | Cry Detection | `crying/main.c` | ADC sampling at 200 Hz, peak-to-peak windowing, calibration |
+| 3 | Motor | `motor/main.c` | PWM-driven rocking mechanism, responds to master commands |
 
-### 2. Decision-Making Module
-- Determines the appropriate soothing response
-- Implements a rule-based strategy based on crying intensity and duration
-- Handles system coordination and state transitions
+**Ring UART frame format:** `[DST][SRC][LEN][PAYLOAD...]`
 
-### 3. Motor Control Module
-- Drives physical motion (rocking mechanism)
-- Responds dynamically to control signals from the decision module
-
-### 4. Heartbeat / Monitoring Module
-- Provides system feedback and status monitoring
-- Ensures system reliability during operation
-
-### 5. Display / Interface
-- Visualizes system state
-- Provides debugging and real-time feedback
+Each node forwards frames not addressed to it, creating a ring bus.
 
 ---
 
-## Technical Highlights
+## Cry Detection
 
-- Embedded C programming across all subsystems
-- Real-time system coordination using modular architecture
-- Hardware-software co-design
-- Signal processing for audio-based detection
-- Robust debugging and iterative system refinement
+The detection module samples audio via ADC at 200 Hz and uses a sliding peak-to-peak window (200 ms, configurable) to measure signal amplitude.
 
----
+**Calibration sequence:**
+1. 3 s quiet baseline capture
+2. 5 s loud playback for maximum reference
+3. Threshold derived from calibration data
 
-## Project Structure
+**Key constants** (in `crying/main.c`):
 
-
-├── crying/ # Cry detection module (audio processing)
-├── decision/ # Decision-making logic
-├── Parts/ # Hardware design files (CAD models)
-├── ... # Other supporting modules
-
-
----
-
-## Current Status
-
-- Core functionality: ✅ Completed
-- System integration: ✅ Completed
-- Cry detection: ⚠️ Functional but requires further robustness improvements
-- Hardware interaction: ✅ Stable
-- Decision logic: ✅ Working
+```c
+#define TIME_BETWEEN_SAMPLES_MS  5     // 200 Hz
+#define P2P_WINDOW_MS            200   // peak-to-peak window
+#define CAL_BASELINE_MS          3000  // quiet calibration
+#define CAL_MAX_MS               5000  // loud calibration
+```
 
 ---
 
-## Future Improvements
+## Decision Logic
 
-- Improve reliability of cry detection algorithm
-- Enhance decision-making with adaptive or learning-based methods
-- Refine UI/UX for display module
-- Add safety mechanisms (e.g., emergency stop across all modules)
-- Optimize motor control smoothness
+The master node (`decision/main.c`) polls heartbeat and cry modules every 100 ms and drives the soothing state machine:
 
----
+```c
+#define HEARTBEAT_DELAY   14000   // ~10 s heartbeat period
+#define CRYING_DELAY       4000   // ~2 s cry response delay
+#define CONVERGENCE_DELAY  4000   // convergence timeout
+```
 
-## Notes
-
-This project was developed as a complete end-to-end system, covering:
-- System design
-- Embedded programming
-- Hardware integration
-- Testing and optimization
+On cry detection, the master sends a motor command to start rocking. On convergence (crying stops), it sends a stop command.
 
 ---
 
-## Author
+## Building
 
-Developed independently as part of an embedded systems project (2025).
+Each module has its own `Makefile` targeting the PYNQ board:
+
+```bash
+cd crying && make
+cd decision && make
+cd motor && make
+cd heartbeat && make
+```
+
+Requires `libpynq` (included in the course library at `libpynq-5EID0-2023-v0.3.0/`).
+
+---
+
+## Project Layout
+
+```
+crying/       Cry detection — ADC sampling, calibration, peak-to-peak detection
+decision/     Master node — state machine, UART coordination
+motor/        Motor control — PWM output, rocking actuation
+heartbeat/    Heartbeat monitor — system vitals
+sim/          Simulator for offline testing (sim.c)
+Parts/        Hardware design files (CAD)
+```
+
+---
+
+## Result
+
+Automated intervention reduced crying duration to under 2 minutes in testing.
+
+---
+
+## License
+
+MIT

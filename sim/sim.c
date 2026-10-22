@@ -243,7 +243,7 @@ void generate_matrix()
 {
     int a, f;
 
-    srand(time(0)); // intialize the random seed
+    // the random seed is set in main() (from argv[1] or the clock)
 
     // determine the first sopt for level K1 (idk if the sopt for k1 is always zero but well see)
     Sopt[1] = 10.0 + (rand() % 6); // 5 + a random value between 0-5
@@ -713,8 +713,23 @@ void run_controller()
     }
 }
 
-int main(void)
+int main(int argc, char **argv)
 {
+    // optional seed so a run can be repeated: ./sim/sim 1792644429
+    unsigned int seed = (unsigned int)time(0);
+    if (argc > 1)
+    {
+        char *end;
+        seed = (unsigned int)strtoul(argv[1], &end, 10);
+        if (*argv[1] == '\0' || *end != '\0')
+        {
+            fprintf(stderr, "usage: %s [seed]\n", argv[0]);
+            return 2;
+        }
+    }
+    printf("seed=%u\n", seed);
+    srand(seed);
+
     generate_matrix();
     heartbeat = get_heartbeat(Sopt[9]); // much needed on init. also reminds me
     lastBPM = heartbeat;

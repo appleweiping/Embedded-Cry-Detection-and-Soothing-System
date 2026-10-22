@@ -9,7 +9,8 @@ laptop. What does run anywhere is `sim/sim.c`, a desktop simulator of the decisi
 made-up "stress" model of the baby:
 
 ```text
-$ gcc -Wall -O2 -o sim/sim sim/sim.c -lm && ./sim/sim
+$ gcc -Wall -O2 -o sim/sim sim/sim.c -lm && ./sim/sim 1792644429
+seed=1792644429
 K1: Sopt= 11.0  range=[  0.0,  23.0]
 ...
 K9: Sopt= 75.0  range=[ 63.0,  87.0]
@@ -36,9 +37,20 @@ K9 K9 K9 K9 K9
 finished at t = 154.000 s.
 ```
 
-The simulator randomises its model on every run. In 15 runs on Ubuntu 24.04 (gcc 13.3) it reached
-the gentlest setting after 9 to 12 controller steps, i.e. 122 to 164 simulated seconds. These are
-simulator numbers only; I have no measurements from a real baby to report.
+The simulated baby is random. With no argument the simulator seeds it from the clock, so every run
+is different; it prints the seed first, and passing that seed repeats the run. `rand()` differs
+between C libraries, so the seed above reproduces this exact output only with glibc (Linux); MSYS2
+gcc on Windows gives a different run for the same seed.
+
+Over seeds 1 to 1000 on Ubuntu 24.04 (gcc 13.3) the controller reached the gentlest setting in
+every run, after 8 to 12 controller steps, i.e. 108 to 168 simulated seconds. Seeds 1 to 300 with
+MSYS2 gcc 14.2 on Windows gave the same range. To count them yourself:
+
+```bash
+for s in $(seq 1000); do ./sim/sim $s | awk '/Controller Step/{n++} /finished/{print n, "steps,", $5, "s"}'; done | sort -n | uniq -c
+```
+
+These are simulator numbers only; I have no measurements from a real baby to report.
 
 ## How it works
 

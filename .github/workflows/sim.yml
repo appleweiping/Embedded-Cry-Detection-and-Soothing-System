@@ -21,3 +21,8 @@ jobs:
         run: |
           ./sim/sim | tee sim-output.txt
           grep -q "finished at t =" sim-output.txt
+
+      - name: Check the README example still reproduces
+        run: |
+          ./sim/sim 1792644429 > readme-run.txt
+          grep -qx "finished at t = 154.000 s." readme-run.txt

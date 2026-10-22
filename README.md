@@ -86,11 +86,23 @@ Parts/                                   CAD for the photodiode strap (v4 fits a
 alt-versions/                            other versions of three modules, see below
 ```
 
-`alt-versions/` holds files that were in the module folders next to `main.c`: `CRYING final`,
-`readable crying.c`, `readable heartbeat`, `readable heartbeat.c` and `PWM Final`. They differ from
-`main.c`, and the compiled binaries that used to be committed were built from code closer to these
-files than to `main.c`, so I can't tell which version ran in the final demo. I moved them out of
-the module folders because `make` compiles every `*.c` file there and failed on the second `main()`.
+`alt-versions/` holds other versions of three modules that used to sit in the module folders next
+to `main.c` (old file names in brackets):
+
+| File | Was |
+|------|-----|
+| `alt-versions/crying/crying_alt.c` | `crying/CRYING final` |
+| `alt-versions/crying/crying_readable.c` | `crying/readable crying.c` |
+| `alt-versions/heartbeat/heartbeat_readable.c` | `heartbeat/readable heartbeat.c` |
+| `alt-versions/motor/motor_pwm_alt.c` | `motor/PWM Final` |
+
+Despite the old "final" names, the file `make` builds in each module is `main.c`. These versions
+differ from it, and the compiled binaries that used to be committed were built from code closer to
+these files than to `main.c`, so I can't tell which version ran in the final demo. I moved them out
+of the module folders because `make` compiles every `*.c` file there and failed on the second
+`main()`. There was also a `readable heartbeat` without the `.c`; it was the same as
+`heartbeat_readable.c` minus the Ctrl+C handler, so I deleted it (it is still in the git history,
+and it is the closest match to the old heartbeat binary).
 
 CI ([`.github/workflows/sim.yml`](.github/workflows/sim.yml)) builds and runs the simulator on
 every push.

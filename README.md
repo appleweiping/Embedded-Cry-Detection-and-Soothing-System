@@ -94,7 +94,7 @@ UART pins in a ring in address order.
 ```text
 crying/  decision/  heartbeat/  motor/   the four board programs (main.c + Makefile)
 sim/sim.c                                desktop simulator of the controller
-Parts/                                   CAD for the photodiode strap (v4 fits a fitness-band strap)
+Parts/                                   CAD for the photodiode strap: v2 as STEP, v3/v4 SolidWorks only
 alt-versions/                            other versions of three modules, see below
 ```
 

@@ -39,3 +39,15 @@
 
 # debug information files
 *.dwo
+
+# Board executables built by the libpynq Makefiles
+crying/main
+decision/main
+heartbeat/main
+motor/main
+
+# Host build of the simulator
+sim/sim
+
+# Editor settings
+.vscode/

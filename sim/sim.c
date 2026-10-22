@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
-#include <windows.h>
 
 #define AMP_CH 0
 #define FREQ_CH 1 // example, this is how its probably going to look like in production

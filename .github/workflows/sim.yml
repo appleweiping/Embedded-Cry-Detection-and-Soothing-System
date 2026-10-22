@@ -1,0 +1,23 @@
+name: simulator
+
+# The four board programs need the course's libpynq library and a PYNQ-Z2,
+# so CI only builds and runs the host-side simulator of the decision logic.
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  sim:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build sim/sim.c
+        run: gcc -Wall -O2 -o sim/sim sim/sim.c -lm
+
+      - name: Run the simulator
+        run: |
+          ./sim/sim | tee sim-output.txt
+          grep -q "finished at t =" sim-output.txt

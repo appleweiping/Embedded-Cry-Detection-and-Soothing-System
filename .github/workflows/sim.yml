@@ -12,7 +12,7 @@ jobs:
   sim:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Build sim/sim.c
         run: gcc -Wall -O2 -o sim/sim sim/sim.c -lm

@@ -78,12 +78,13 @@ logic could be tested without hardware.
 ## Building for the boards
 
 Each module folder is a libpynq application. The Makefiles include `../shared.mk` and `../end.mk`,
-so they only build inside the course library (`libpynq-5EID0-2023`, not included here):
+so they only build inside the course library (`libpynq-5EWC0-2023`, not included here). The
+binaries that used to be committed here were built against v0.2.6 of it:
 
 ```bash
-# on the PYNQ board, with the course library unpacked in ~/libpynq-5EID0-2023-v0.3.0
-cp -r crying decision heartbeat motor ~/libpynq-5EID0-2023-v0.3.0/applications/
-cd ~/libpynq-5EID0-2023-v0.3.0/applications/decision && make && ./main
+# on the PYNQ board, with the course library unpacked in ~/libpynq-5EWC0-2023-v0.2.6
+cp -r crying decision heartbeat motor ~/libpynq-5EWC0-2023-v0.2.6/applications/
+cd ~/libpynq-5EWC0-2023-v0.2.6/applications/decision && make && ./main
 ```
 
 Run `make` the same way in the other three folders, one program per board, and connect the boards'
